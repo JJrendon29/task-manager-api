@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from app.database import get_session
 from app.models.task import Task, TaskStatus
+from app.models.user import User
 from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse
+from app.auth import get_current_user
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -14,9 +16,10 @@ def get_tasks(
     status: Optional[TaskStatus] = Query(default=None),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
 ):
-    query = select(Task)
+    query = select(Task).where(Task.user_id == current_user.id)
 
     if status:
         query = query.where(Task.status == status)
@@ -26,8 +29,12 @@ def get_tasks(
 
 
 @router.post("/", response_model=TaskResponse, status_code=201)
-def create_task(task_data: TaskCreate, session: Session = Depends(get_session)):
-    task = Task(**task_data.model_dump())
+def create_task(
+    task_data: TaskCreate,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    task = Task(**task_data.model_dump(), user_id=current_user.id)
     session.add(task)
     session.commit()
     session.refresh(task)
@@ -35,9 +42,13 @@ def create_task(task_data: TaskCreate, session: Session = Depends(get_session)):
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
-def get_task(task_id: int, session: Session = Depends(get_session)):
+def get_task(
+    task_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
     task = session.get(Task, task_id)
-    if not task:
+    if not task or task.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return task
 
@@ -46,10 +57,11 @@ def get_task(task_id: int, session: Session = Depends(get_session)):
 def update_task(
     task_id: int,
     task_data: TaskUpdate,
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
 ):
     task = session.get(Task, task_id)
-    if not task:
+    if not task or task.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
     update_data = task_data.model_dump(exclude_unset=True)
@@ -64,9 +76,13 @@ def update_task(
 
 
 @router.delete("/{task_id}", status_code=204)
-def delete_task(task_id: int, session: Session = Depends(get_session)):
+def delete_task(
+    task_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
     task = session.get(Task, task_id)
-    if not task:
+    if not task or task.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     session.delete(task)
     session.commit()

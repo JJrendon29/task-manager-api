@@ -15,5 +15,6 @@ class Task(SQLModel, table=True):
     title: str = Field(min_length=1, max_length=100)
     description: Optional[str] = Field(default=None, max_length=500)
     status: TaskStatus = Field(default=TaskStatus.pending)
+    user_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
