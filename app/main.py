@@ -9,7 +9,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="Task Manager API",
+    title="Task Manager API v1.0",
     description="REST API para gestión de tareas con autenticación JWT",
     version="1.0.0",
     lifespan=lifespan
