@@ -16,3 +16,4 @@ venv/
 
 # Alembic
 *.db
+actions-runner/
