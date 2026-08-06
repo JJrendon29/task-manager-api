@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <div id="screen-landing" class="screen">
+    <div class="container center">
+      <div class="header">
+        <h1>task manager</h1>
+        <p>Gestión de tareas con autenticación JWT y API REST</p>
+      </div>
+      <div class="card">
+        <p class="demo-desc">
+          Cada sesión de demo es un espacio aislado — tus tareas son solo tuyas.
+        </p>
+        <button class="btn" id="demo-btn" onclick="startDemo()">Probar demo</button>
+        <div class="error-msg" id="landing-error"></div>
+      </div>
+      <div class="docs-link">
+        <a href="/docs" target="_blank">Ver documentación de la API →</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-tasks" class="screen hidden">
+    <div class="topbar">
+      <span class="topbar-title">task manager</span>
+      <span class="topbar-user" id="topbar-user"></span>
+    </div>
+
+    <div class="container">
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="new-task-row">
+          <input
+            type="text"
+            id="new-task-input"
+            placeholder="Nueva tarea..."
+            maxlength="100"
+          />
+          <button class="btn btn-inline" onclick="createTask()">Agregar</button>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-btn active" data-status="all" onclick="setFilter(this, 'all')">Todas</button>
+        <button class="filter-btn" data-status="pending" onclick="setFilter(this, 'pending')">Pendientes</button>
+        <button class="filter-btn" data-status="in_progress" onclick="setFilter(this, 'in_progress')">En progreso</button>
+        <button class="filter-btn" data-status="done" onclick="setFilter(this, 'done')">Completadas</button>
+      </div>
+
+      <div id="tasks-list"></div>
+      <div class="empty-state hidden" id="empty-state">
+        <p>No hay tareas aquí todavía.</p>
+      </div>
+      <div class="error-msg" id="tasks-error"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>
