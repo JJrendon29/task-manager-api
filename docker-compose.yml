@@ -27,6 +27,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - api
 
 volumes:
   postgres_data:
